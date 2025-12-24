@@ -32,7 +32,13 @@ AVAILABLE_LLMS = [
     "o3-mini-2025-01-31",
     # DeepSeek Models
     "deepseek-coder-v2-0724",
+    "deepseek-coder",
+    "deepseek-chat",
+    "deepseek-reasoner",
     "deepcoder-14b",
+    # GLM Models
+    "glm-4.7",
+    "glm-4.5-air",
     # Llama 3 models
     "llama3.1-405b",
     # Anthropic Claude models via Amazon Bedrock
@@ -133,10 +139,10 @@ def get_batch_responses_from_llm(
         new_msg_history = [
             new_msg_history + [{"role": "assistant", "content": c}] for c in content
         ]
-    elif model == "deepseek-coder-v2-0724":
+    elif "deepseek" in model or "glm" in model:
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
         response = client.chat.completions.create(
-            model="deepseek-coder",
+            model=model,
             messages=[
                 {"role": "system", "content": system_message},
                 *new_msg_history,
@@ -346,10 +352,10 @@ def get_response_from_llm(
         )
         content = response.choices[0].message.content
         new_msg_history = new_msg_history + [{"role": "assistant", "content": content}]
-    elif model == "deepseek-coder-v2-0724":
+    elif "deepseek" in model or "glm" in model:
         new_msg_history = msg_history + [{"role": "user", "content": msg}]
         response = client.chat.completions.create(
-            model="deepseek-coder",
+            model=model,
             messages=[
                 {"role": "system", "content": system_message},
                 *new_msg_history,
@@ -501,12 +507,12 @@ def create_client(model) -> tuple[Any, str]:
     elif "o1" in model or "o3" in model:
         print(f"Using OpenAI API with model {model}.")
         return openai.OpenAI(), model
-    elif model == "deepseek-coder-v2-0724":
+    elif "deepseek" in model or "glm" in model:
         print(f"Using OpenAI API with {model}.")
         return (
             openai.OpenAI(
-                api_key=os.environ["DEEPSEEK_API_KEY"],
-                base_url="https://api.deepseek.com",
+                api_key=os.environ["DEEPSEEK_API_KEY"] if "deepseek" in model else os.environ["GLM_API_KEY"],
+                base_url="https://api.deepseek.com" if "deepseek" in model else "glm",
             ),
             model,
         )
