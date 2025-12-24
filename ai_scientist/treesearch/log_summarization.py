@@ -356,7 +356,12 @@ def overall_summarize(journals, cfg=None):
                 total=len(list(journals)),
             )
         )
-        draft_summary, baseline_summary, research_summary, ablation_summary = results
+        padded_results = [None] * 4
+        for idx, res in enumerate(results):
+            if idx < 4:
+                padded_results[idx] = res
+
+    draft_summary, baseline_summary, research_summary, ablation_summary = padded_results
 
     return draft_summary, baseline_summary, research_summary, ablation_summary
 
