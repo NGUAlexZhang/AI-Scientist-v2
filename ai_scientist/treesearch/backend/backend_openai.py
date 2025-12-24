@@ -6,6 +6,7 @@ from .utils import FunctionSpec, OutputType, opt_messages_to_list, backoff_creat
 from funcy import notnone, once, select_values
 import openai
 from rich import print
+import os
 
 logger = logging.getLogger("ai-scientist")
 
@@ -24,7 +25,15 @@ def get_ai_client(model: str, max_retries=2) -> openai.OpenAI:
             max_retries=max_retries
         )
     else:
-        client = openai.OpenAI(max_retries=max_retries)
+        base_url = "https://api.openai.com/v1"
+        api_key = os.environ["OPENAI_API_KEY"]
+        if "deepseek" in model:
+            base_url = "https://api.deepseek.com/v1"
+            api_key = os.environ["DEEPSEEK_API_KEY"]
+        elif "glm" in model:
+            base_url = "https://open.bigmodel.cn/api/coding/paas/v4"
+            api_key = os.environ["GLM_API_KEY"]
+        client = openai.OpenAI(base_url=base_url, api_key=api_key, max_retries=max_retries)
     return client
 
 
