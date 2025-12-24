@@ -168,6 +168,7 @@ def prep_cfg(cfg: Config):
 
     # validate the config
     cfg_schema: Config = OmegaConf.structured(Config)
+    print(cfg_schema, cfg)
     cfg = OmegaConf.merge(cfg_schema, cfg)
 
     if cfg.agent.type not in ["parallel", "sequential"]:
